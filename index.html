@@ -3,157 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MetaClean - Monitoramento de Biodigestor</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <title>MetaClean - Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <div id="login-overlay" class="login-overlay">
+    <div id="login-overlay">
         <div class="login-card">
-            <div class="login-logo">
-                <i class="ph ph-leaf"></i>
-                <h2>MetaClean</h2>
-            </div>
-            <p class="login-subtitle">Acesse o painel do seu biodigestor</p>
-            
-            <form id="login-form" onsubmit="realizarLogin(event)">
-                <div class="input-group">
-                    <label for="usuario">Usuário ou E-mail</label>
-                    <input type="text" id="usuario" placeholder="Ex: escola" required>
-                </div>
-                <div class="input-group">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" placeholder="Sua senha" required>
-                </div>
-                <button type="submit" class="btn-login">Entrar no Sistema</button>
-                <p id="login-erro" class="login-erro">Usuário ou senha inválidos.</p>
+            <h2>MetaClean - Entrar</h2>
+            <form onsubmit="realizarLogin(event)">
+                <input type="email" id="usuario" placeholder="Seu e-mail" required>
+                <input type="password" id="senha" placeholder="Sua senha" required>
+                <button type="submit">Acessar Painel</button>
+                <p id="login-erro">Usuário ou senha inválidos.</p>
             </form>
         </div>
     </div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="logo">
-            <h2>MetaClean</h2>
-        </div>
-        <nav class="menu">
-            <a href="#" class="active" onclick="navigate('dashboard', this)"><i class="ph ph-squares-four"></i> Visão Geral</a>
-            <a href="#" onclick="navigate('monitoramento', this)"><i class="ph ph-chart-line-up"></i> Monitoramento</a>
-            <a href="#" onclick="navigate('alertas', this)"><i class="ph ph-warning-circle"></i> Alertas</a>
-            <a href="#" onclick="navigate('historico', this)"><i class="ph ph-clock-counter-clockwise"></i> Histórico</a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="user-info-box">
-                <i class="ph ph-user-circle"></i>
-                <div>
-                    <span id="user-display-name">Carregando...</span>
-                    <button onclick="realizarLogout()" class="btn-logout">Sair</button>
-                </div>
+        <div>
+            <div class="sidebar-header">
+                MetaClean
             </div>
+            <ul class="menu">
+                <li><a href="#" class="active" onclick="navigate('visao-geral', this)">Visão Geral</a></li>
+                <li><a href="#" onclick="navigate('monitoramento', this)">Monitoramento</a></li>
+                <li><a href="#" onclick="navigate('alertas', this)">Alertas</a></li>
+                <li><a href="#" onclick="navigate('historico', this)">Histórico</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <p id="user-display-name" style="font-size: 12px; margin-bottom: 10px; color: rgba(255,255,255,0.7);"></p>
+            <button class="logout-btn" onclick="realizarLogout()">Sair</button>
         </div>
     </aside>
 
     <main class="main-content">
-        <header class="top-header">
-            <div class="header-titles">
-                <button class="menu-toggle" onclick="toggleMenu()"><i class="ph ph-list"></i></button>
-                <div>
-                    <h1>Monitoramento do Biodigestor</h1>
-                    <p class="subtitle">Conectado ao banco de dados em tempo real</p>
-                </div>
-            </div>
+        <header class="topbar">
+            <button onclick="toggleMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer; display: none;">☰</button>
+            <h1 id="biodigestor-id">BIODIGESTOR #002</h1>
+            <span style="font-size: 13px; color: #666;">Última leitura: <span id="last-update">--:--:--</span></span>
         </header>
 
-        <section id="dashboard" class="page-section active">
-            <div class="status-bar">
-                <div class="status-info">
-                    <strong id="biodigestor-id">BIODIGESTOR #...</strong>
-                    <span class="badge badge-normal">Sistema Ativo</span>
-                </div>
-                <div class="update-info">Última leitura: <span id="last-update">--:--:--</span></div>
-            </div>
-
-            <div class="grid-cards">
-                <div class="card sensor-card">
-                    <div class="card-header"><i class="ph ph-thermometer"></i> Temperatura</div>
-                    <div class="card-value"><span id="val-temp">--</span> °C</div>
-                    <div class="card-status normal">Atualizado do Banco</div>
-                </div>
-                <div class="card sensor-card">
-                    <div class="card-header"><i class="ph ph-drop"></i> Umidade</div>
-                    <div class="card-value"><span id="val-umid">--</span> %</div>
-                    <div class="card-status normal">Atualizado do Banco</div>
-                </div>
-                <div class="card sensor-card">
-                    <div class="card-header"><i class="ph ph-trash"></i> Nível de Resíduos</div>
-                    <div class="card-value"><span id="val-nivel">--</span> %</div>
-                    <div class="card-status normal">Atualizado do Banco</div>
-                </div>
-                <div class="card sensor-card">
-                    <div class="card-header"><i class="ph ph-wind"></i> Biogás Produzido</div>
-                    <div class="card-value"><span id="val-gas">--</span> m³</div>
-                    <div class="card-status normal">Atualizado do Banco</div>
-                </div>
-            </div>
-
-            <div class="grid-2col">
-                <div class="card">
-                    <h3>Monitoramento em Tempo Real</h3>
-                    <canvas id="realtimeChart"></canvas>
-                </div>
-                
-                <div class="card-column">
+        <div class="page-container">
+            <section id="visao-geral" class="page-section active">
+                <div class="cards-grid">
                     <div class="card">
+                        <h3>Temperatura</h3>
+                        <div class="value"><span id="val-temp">--</span> °C</div>
+                    </div>
+                    <div class="card">
+                        <h3>Umidade</h3>
+                        <div class="value"><span id="val-umid">--</span> %</div>
+                    </div>
+                    <div class="card">
+                        <h3>Nível de Resíduos</h3>
+                        <div class="value"><span id="val-nivel">--</span> %</div>
+                    </div>
+                    <div class="card">
+                        <h3>Biogás Produzido</h3>
+                        <div class="value"><span id="val-gas">--</span> m³</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div class="chart-container">
+                        <canvas id="realtimeChart"></canvas>
+                    </div>
+                    <div class="card" style="height: fit-content;">
                         <h3>Status dos Componentes</h3>
-                        <ul class="component-list">
-                            <li><i class="ph ph-check-circle text-green"></i> ESP32 / Banco de Dados — Conectado</li>
-                        </ul>
+                        <p id="status-conexao" style="margin-top: 15px; font-weight: bold; color: #2D6A4F;">
+                            Aguardando ESP32...
+                        </p>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="monitoramento" class="page-section">
-            <h2>Monitoramento Detalhado</h2>
-            <p>Leituras diretas enviadas pelos sensores do biodigestor.</p>
-            <div class="grid-2col mt-1">
-                <div class="card">
-                    <div class="card-header-flex">
-                        <h3><i class="ph ph-thermometer"></i> Temperatura</h3>
-                        <span class="badge badge-normal">Tempo Real</span>
+            <section id="monitoramento" class="page-section">
+                <h2>Monitoramento Detalhado</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div class="card">
+                        <h3>Temperatura Interna</h3>
+                        <div class="value"><span id="mon-temp">--</span> °C</div>
+                        <div class="chart-container" style="margin-top: 15px;">
+                            <canvas id="tempChart"></canvas>
+                        </div>
                     </div>
-                    <p class="big-value"><span id="mon-temp">--</span> °C</p>
-                    <canvas id="tempChart" class="mt-1"></canvas>
-                </div>
-                <div class="card">
-                    <div class="card-header-flex">
-                        <h3><i class="ph ph-wind"></i> Produção de Gás</h3>
-                        <span class="badge badge-normal">Tempo Real</span>
+                    <div class="card">
+                        <h3>Produção de Gás</h3>
+                        <div class="value"><span id="mon-gas">--</span> m³</div>
+                        <div class="chart-container" style="margin-top: 15px;">
+                            <canvas id="gasChart"></canvas>
+                        </div>
                     </div>
-                    <p class="big-value"><span id="mon-gas">--</span> m³</p>
-                    <canvas id="gasChart" class="mt-1"></canvas>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="alertas" class="page-section">
-            <h2>Central de Alertas</h2>
-            <div class="alerts-list mt-1" id="alerts-container">
-                <p>Nenhum alerta crítico registrado no banco de dados.</p>
-            </div>
-        </section>
+            <section id="alertas" class="page-section">
+                <h2>Central de Alertas</h2>
+                <div class="card" style="margin-top: 20px;">
+                    <p>Nenhum alerta crítico registrado até o momento.</p>
+                </div>
+            </section>
 
-        <section id="historico" class="page-section">
-            <h2>Histórico</h2>
-            <p>Registros salvos no banco de dados do seu dispositivo.</p>
-            <div class="card mt-1">
-                <p>Visualizando logs consolidados direto da nuvem.</p>
-            </div>
-        </section>
+            <section id="historico" class="page-section">
+                <h2>Histórico de Registros</h2>
+                <div class="card" style="margin-top: 20px;">
+                    <p>Exibindo leituras em tempo real mantidas na janela de pontos ativa.</p>
+                </div>
+            </section>
+        </div>
     </main>
 
     <script type="module" src="script.js"></script>
