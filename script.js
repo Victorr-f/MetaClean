@@ -132,7 +132,15 @@ function atualizarGraficosDinamicos(data) {
                 tension: 0.4
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
 
     const ctxTemp = document.getElementById('tempChart').getContext('2d');
@@ -149,7 +157,15 @@ function atualizarGraficosDinamicos(data) {
                 tension: 0.3
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
 
     const ctxGas = document.getElementById('gasChart').getContext('2d');
@@ -166,7 +182,15 @@ function atualizarGraficosDinamicos(data) {
                 tension: 0.3
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
 }
 
