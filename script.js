@@ -149,3 +149,8 @@ function atualizarGraficosDinamicos(data) {
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
+
+window.realizarLogin = realizarLogin;
+window.realizarLogout = realizarLogout;
+window.navigate = navigate;
+window.toggleMenu = toggleMenu;
