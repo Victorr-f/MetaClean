@@ -3,13 +3,13 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
-  authDomain: "metaclean-site.firebaseapp.com",
-  databaseURL: "https://metaclean-site-default-rtdb.firebaseio.com",
-  projectId: "metaclean-site",
-  storageBucket: "metaclean-site.firebasestorage.app",
-  messagingSenderId: "363120526555",
-  appId: "1:363120526555:web:08cc0f27f3aca6d99938fe"
+    apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
+    authDomain: "metaclean-site.firebaseapp.com",
+    databaseURL: "https://metaclean-site-default-rtdb.firebaseio.com",
+    projectId: "metaclean-site",
+    storageBucket: "metaclean-site.firebasestorage.app",
+    messagingSenderId: "363120526555",
+    appId: "1:363120526555:web:08cc0f27f3aca6d99938fe"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -31,6 +31,7 @@ function realizarLogin(event) {
             console.error("Erro no login:", error.code);
         });
 }
+
 function realizarLogout() {
     signOut(auth).then(() => {
         location.reload();
@@ -88,11 +89,30 @@ function toggleMenu() {
     document.getElementById('sidebar').classList.toggle('open');
 }
 
+const maxPontos = 15; 
+let historicoLabels = [];
+let historicoTemp = [];
+let historicoGas = [];
+
 let realtimeChartInst = null;
 let tempChartInst = null;
 let gasChartInst = null;
 
 function atualizarGraficosDinamicos(data) {
+    const horaAtual = new Date().toLocaleTimeString();
+    const tempAtual = parseFloat(data.temperatura) || 0;
+    const gasAtual = parseFloat(data.gas) || 0;
+
+    historicoLabels.push(horaAtual);
+    historicoTemp.push(tempAtual);
+    historicoGas.push(gasAtual);
+
+    if (historicoLabels.length > maxPontos) {
+        historicoLabels.shift();
+        historicoTemp.shift();
+        historicoGas.shift();
+    }
+
     if(realtimeChartInst) realtimeChartInst.destroy();
     if(tempChartInst) tempChartInst.destroy();
     if(gasChartInst) gasChartInst.destroy();
@@ -101,10 +121,10 @@ function atualizarGraficosDinamicos(data) {
     realtimeChartInst = new Chart(ctxRealtime, {
         type: 'line',
         data: {
-            labels: ['Atual'],
+            labels: historicoLabels,
             datasets: [{
                 label: 'Temperatura °C',
-                data: [parseFloat(data.temperatura) || 0],
+                data: historicoTemp,
                 borderColor: '#2D6A4F',
                 backgroundColor: 'rgba(45, 106, 79, 0.1)',
                 borderWidth: 2,
@@ -119,11 +139,13 @@ function atualizarGraficosDinamicos(data) {
     tempChartInst = new Chart(ctxTemp, {
         type: 'line',
         data: {
-            labels: ['Leitura Atual'],
+            labels: historicoLabels,
             datasets: [{
-                label: 'Temperatura',
-                data: [parseFloat(data.temperatura) || 0],
+                label: 'Temperatura (°C)',
+                data: historicoTemp,
                 borderColor: '#1B4332',
+                backgroundColor: 'rgba(27, 67, 50, 0.1)',
+                fill: true,
                 tension: 0.3
             }]
         },
@@ -132,21 +154,10 @@ function atualizarGraficosDinamicos(data) {
 
     const ctxGas = document.getElementById('gasChart').getContext('2d');
     gasChartInst = new Chart(ctxGas, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: ['Produção Atual'],
+            labels: historicoLabels,
             datasets: [{
                 label: 'Biogás (m³)',
-                data: [parseFloat(data.gas) || 0],
-                backgroundColor: '#95D5B2',
-                borderRadius: 4
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-window.realizarLogin = realizarLogin;
-window.realizarLogout = realizarLogout;
-window.navigate = navigate;
-window.toggleMenu = toggleMenu;
+                data: historicoGas,
+                borderColor
