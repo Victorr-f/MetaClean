@@ -6,44 +6,44 @@
 }
 
 :root {
-    --bg-color: #0b1e16;
-    --card-bg: #112a1f;
-    --card-border: #183b2c;
-    --accent-green: #2a6f4e;
-    --light-green: #52b788;
-    --text-white: #ffffff;
-    --text-muted: #fafafa;
-    --danger-color: #e63946;
+    --cor-fundo: #0b1e16;
+    --fundo-cartao: #112a1f;
+    --borda-cartao: #183b2c;
+    --verde-destaque: #2a6f4e;
+    --verde-claro: #52b788;
+    --texto-branco: #ffffff;
+    --texto-suave: #a0b0a8;
+    --cor-alerta: #e63946;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-white);
+    background-color: var(--cor-fundo);
+    color: var(--texto-branco);
     display: flex;
     height: 100vh;
     overflow: hidden;
 }
 
-#login-overlay {
+#sobreposicao-login {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--bg-color);
+    background: var(--cor-fundo);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 99999;
 }
 
-#login-overlay.hidden {
+#sobreposicao-login.hidden {
     display: none;
 }
 
-.login-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+.cartao-login {
+    background: var(--fundo-cartao);
+    border: 1px solid var(--borda-cartao);
     padding: 40px;
     border-radius: 12px;
     width: 100%;
@@ -51,32 +51,32 @@ body {
     text-align: center;
 }
 
-.login-card h2 {
-    color: var(--text-white);
+.cartao-login h2 {
+    color: var(--texto-branco);
     margin-bottom: 24px;
 }
 
-.login-card input {
+.cartao-login input {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
     background: #081711;
-    border: 1px solid var(--card-border);
-    color: var(--text-white);
+    border: 1px solid var(--borda-cartao);
+    color: var(--texto-branco);
     border-radius: 6px;
     font-size: 14px;
     outline: none;
 }
 
-.login-card input:focus {
-    border-color: var(--accent-green);
+.cartao-login input:focus {
+    border-color: var(--verde-destaque);
 }
 
-.login-card button {
+.cartao-login button {
     width: 100%;
     padding: 12px;
-    background-color: var(--accent-green);
-    color: var(--text-white);
+    background-color: var(--verde-destaque);
+    color: var(--texto-branco);
     border: none;
     border-radius: 6px;
     font-size: 16px;
@@ -84,31 +84,31 @@ body {
     cursor: pointer;
 }
 
-#login-erro {
-    color: var(--danger-color);
+#erro-login {
+    color: var(--cor-alerta);
     font-size: 13px;
     margin-top: 10px;
     display: none;
 }
 
-.sidebar {
+.barra-lateral {
     width: 260px;
     min-width: 260px;
     background-color: #07150e;
-    color: var(--text-white);
+    color: var(--texto-branco);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     z-index: 100;
-    border-right: 1px solid var(--card-border);
+    border-right: 1px solid var(--borda-cartao);
 }
 
-.sidebar-header {
+.cabecalho-barra-lateral {
     padding: 25px;
     font-size: 20px;
     font-weight: bold;
-    border-bottom: 1px solid var(--card-border);
-    color: var(--text-white);
+    border-bottom: 1px solid var(--borda-cartao);
+    color: var(--texto-branco);
 }
 
 .menu {
@@ -120,25 +120,25 @@ body {
 .menu li a {
     display: block;
     padding: 15px 25px;
-    color: var(--text-muted);
+    color: var(--texto-suave);
     text-decoration: none;
 }
 
 .menu li a:hover, .menu li a.active {
-    background-color: var(--card-bg);
-    color: var(--text-white);
-    border-left: 4px solid var(--accent-green);
+    background-color: var(--fundo-cartao);
+    color: var(--texto-branco);
+    border-left: 4px solid var(--verde-destaque);
 }
 
-.sidebar-footer {
+.rodape-barra-lateral {
     padding: 20px 25px;
-    border-top: 1px solid var(--card-border);
+    border-top: 1px solid var(--borda-cartao);
 }
 
-.logout-btn {
+.botao-sair {
     background: transparent;
-    border: 1px solid var(--danger-color);
-    color: var(--danger-color);
+    border: 1px solid var(--cor-alerta);
+    color: var(--cor-alerta);
     width: 100%;
     padding: 10px;
     border-radius: 6px;
@@ -146,93 +146,93 @@ body {
     font-weight: bold;
 }
 
-.main-content {
+.conteudo-principal {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    background-color: var(--bg-color);
+    background-color: var(--cor-fundo);
     height: 100vh;
 }
 
-.topbar {
-    background-color: var(--bg-color);
+.barra-superior {
+    background-color: var(--cor-fundo);
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.topbar h1 {
-    color: var(--text-white);
+.barra-superior h1 {
+    color: var(--texto-branco);
     font-size: 20px;
     font-weight: bold;
 }
 
-.topbar span {
-    color: var(--text-muted) !important;
+.barra-superior span {
+    color: var(--texto-suave) !important;
 }
 
-.page-container {
+.conteiner-pagina {
     padding: 0 30px 30px 30px;
     flex-grow: 1;
 }
 
-.page-section {
+.secao-pagina {
     display: none;
 }
 
-.page-section.active {
+.secao-pagina.active {
     display: block;
 }
 
-.cards-grid {
+.grade-cartoes {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 25px;
 }
 
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+.cartao {
+    background: var(--fundo-cartao);
+    border: 1px solid var(--borda-cartao);
     padding: 20px;
     border-radius: 10px;
-    border-left: 4px solid var(--accent-green);
+    border-left: 4px solid var(--verde-destaque);
 }
 
-.card h3 {
+.cartao h3 {
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--texto-suave);
     margin-bottom: 10px;
 }
 
-.card .value {
+.cartao .valor {
     font-size: 26px;
     font-weight: bold;
-    color: var(--text-white);
+    color: var(--texto-branco);
 }
 
-.chart-container {
+.conteiner-grafico {
     position: relative;
     height: 320px !important;
     width: 100%;
     max-height: 320px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    background: var(--fundo-cartao);
+    border: 1px solid var(--borda-cartao);
     padding: 15px;
     border-radius: 10px;
     overflow: hidden;
 }
 
 @media (max-width: 900px) {
-    .sidebar {
+    .barra-lateral {
         position: fixed;
         height: 100%;
         transform: translateX(-100%);
     }
 
-    .sidebar.open {
+    .barra-lateral.open {
         transform: translateX(0);
     }
 }
