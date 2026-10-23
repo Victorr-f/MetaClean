@@ -18,6 +18,10 @@ const db = getDatabase(app);
 
 function realizarLogin(event) {
     event.preventDefault();
+    
+    // Alerta de teste para ver se o botão está a funcionar
+    alert("O botão foi clicado com sucesso!");
+
     const email = document.getElementById('usuario').value.trim();
     const senha = document.getElementById('senha').value.trim();
     const erroMsg = document.getElementById('login-erro');
@@ -28,8 +32,7 @@ function realizarLogin(event) {
         })
         .catch((error) => {
             erroMsg.style.display = 'block';
-            // Isto vai abrir uma janela com o erro exato do Firebase para você conseguir ler:
-            alert("Erro no login: " + error.message);
+            alert("Erro do Firebase: " + error.code);
         });
 }
 
