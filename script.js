@@ -26,6 +26,17 @@ function realizarLogin(event) {
         .then(() => {
             erroMsg.style.display = 'none';
         })
+        .catch((error) => {
+            erroMsg.style.display = 'block';
+            // Isto vai abrir uma janela com o erro exato do Firebase para você conseguir ler:
+            alert("Erro no login: " + error.message);
+        });
+}
+
+    signInWithEmailAndPassword(auth, email, senha)
+        .then(() => {
+            erroMsg.style.display = 'none';
+        })
         .catch(() => {
             erroMsg.style.display = 'block';
         });
