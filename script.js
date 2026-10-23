@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
@@ -16,20 +16,65 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+let modoCadastro = false;
+
+function alternarModoLogin(event) {
+    event.preventDefault();
+    modoCadastro = !modoCadastro;
+    const titulo = document.getElementById('login-titulo');
+    const btn = document.getElementById('btn-submit-login');
+    const toggleText = document.getElementById('toggle-text');
+    const toggleLink = document.getElementById('toggle-link');
+    const erroMsg = document.getElementById('login-erro');
+    erroMsg.style.display = 'none';
+
+    if (modoCadastro) {
+        titulo.innerText = "MetaClean - Cadastro";
+        btn.innerText = "Criar Conta";
+        toggleText.innerText = "Já tem uma conta?";
+        toggleLink.innerText = "Faça login";
+    } else {
+        titulo.innerText = "MetaClean - Entrar";
+        btn.innerText = "Acessar Painel";
+        toggleText.innerText = "Não tem uma conta?";
+        toggleLink.innerText = "Cadastre-se";
+    }
+}
+
 function realizarLogin(event) {
     event.preventDefault();
     const email = document.getElementById('usuario').value.trim();
     const senha = document.getElementById('senha').value.trim();
     const erroMsg = document.getElementById('login-erro');
 
-    signInWithEmailAndPassword(auth, email, senha)
-        .then(() => {
-            erroMsg.style.display = 'none';
-        })
-        .catch((error) => {
-            erroMsg.style.display = 'block';
-            console.error("Erro no login:", error.code);
-        });
+    if (modoCadastro) {
+        createUserWithEmailAndPassword(auth, email, senha)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                const dadosIniciais = {
+                    nomeDispositivo: "BIODIGESTOR #001",
+                    temperatura: 0,
+                    umidade: 0,
+                    nivel: 0,
+                    gas: 0
+                };
+                set(ref(db, 'dispositivos/' + user.uid), dadosIniciais);
+                erroMsg.style.display = 'none';
+            })
+            .catch((error) => {
+                erroMsg.style.display = 'block';
+                erroMsg.innerText = "Erro ao cadastrar: " + error.message;
+            });
+    } else {
+        signInWithEmailAndPassword(auth, email, senha)
+            .then(() => {
+                erroMsg.style.display = 'none';
+            })
+            .catch((error) => {
+                erroMsg.style.display = 'block';
+                erroMsg.innerText = "Usuário ou senha inválidos.";
+            });
+    }
 }
 
 function realizarLogout() {
@@ -221,5 +266,6 @@ function atualizarGraficosDinamicos(data) {
 
 window.realizarLogin = realizarLogin;
 window.realizarLogout = realizarLogout;
+window.alternarModoLogin = alternarModoLogin;
 window.navigate = navigate;
 window.toggleMenu = toggleMenu;
