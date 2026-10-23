@@ -48,10 +48,15 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+let unsubscribeDB = null;
+
 function escutarDadosDoBanco(userId) {
+    if (unsubscribeDB) {
+        unsubscribeDB();
+    }
     const sensorRef = ref(db, 'dispositivos/' + userId);
     
-    onValue(sensorRef, (snapshot) => {
+    unsubscribeDB = onValue(sensorRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
             document.getElementById('biodigestor-id').innerText = data.nomeDispositivo || "BIODIGESTOR";
