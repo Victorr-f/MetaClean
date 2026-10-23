@@ -49,6 +49,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 let unsubscribeDB = null;
+let ultimaLeituraTimestamp = Date.now();
 
 function escutarDadosDoBanco(userId) {
     if (unsubscribeDB) {
@@ -59,6 +60,14 @@ function escutarDadosDoBanco(userId) {
     unsubscribeDB = onValue(sensorRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
+            ultimaLeituraTimestamp = Date.now();
+            
+            const statusEl = document.getElementById('status-conexao');
+            if (statusEl) {
+                statusEl.innerText = "ESP32 / Banco de Dados — Conectado";
+                statusEl.style.color = "#2D6A4F";
+            }
+
             document.getElementById('biodigestor-id').innerText = data.nomeDispositivo || "BIODIGESTOR";
             document.getElementById('val-temp').innerText = data.temperatura || "--";
             document.getElementById('val-umid').innerText = data.umidade || "--";
@@ -73,6 +82,17 @@ function escutarDadosDoBanco(userId) {
         }
     });
 }
+
+setInterval(() => {
+    const agora = Date.now();
+    const statusEl = document.getElementById('status-conexao');
+    if (statusEl && auth.currentUser) {
+        if (agora - ultimaLeituraTimestamp > 70000) {
+            statusEl.innerText = "ESP32 — Desconectado";
+            statusEl.style.color = "#e63946";
+        }
+    }
+}, 5000);
 
 function navigate(sectionId, element) {
     document.querySelectorAll('.page-section').forEach(section => {
