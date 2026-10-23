@@ -317,16 +317,17 @@ body {
     margin-right: 15px;
 }
 
-.chart-container, div[style*="position: relative"] {
+.chart-container {
     position: relative;
-    height: 280px !important;
     width: 100%;
-    max-height: 280px;
+    height: 260px;
+    max-height: 260px;
     background: var(--white);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     margin-bottom: 30px;
+    overflow: hidden;
 }
 
 @media (max-width: 900px) {
