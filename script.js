@@ -19,7 +19,6 @@ const db = getDatabase(app);
 function realizarLogin(event) {
     event.preventDefault();
     
-    // Alerta de teste para ver se o botão está a funcionar
     alert("O botão foi clicado com sucesso!");
 
     const email = document.getElementById('usuario').value.trim();
@@ -33,15 +32,6 @@ function realizarLogin(event) {
         .catch((error) => {
             erroMsg.style.display = 'block';
             alert("Erro do Firebase: " + error.code);
-        });
-}
-
-    signInWithEmailAndPassword(auth, email, senha)
-        .then(() => {
-            erroMsg.style.display = 'none';
-        })
-        .catch(() => {
-            erroMsg.style.display = 'block';
         });
 }
 
