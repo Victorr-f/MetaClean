@@ -139,7 +139,7 @@ function atualizarGraficosDinamicos(data) {
         },
         options: { 
             responsive: true, 
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             scales: {
                 y: {
                     beginAtZero: true
@@ -147,6 +147,57 @@ function atualizarGraficosDinamicos(data) {
             }
         }
     });
+
+    const ctxTemp = document.getElementById('tempChart').getContext('2d');
+    tempChartInst = new Chart(ctxTemp, {
+        type: 'line',
+        data: {
+            labels: historicoLabels,
+            datasets: [{
+                label: 'Temperatura (°C)',
+                data: historicoTemp,
+                borderColor: '#1B4332',
+                backgroundColor: 'rgba(27, 67, 50, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const ctxGas = document.getElementById('gasChart').getContext('2d');
+    gasChartInst = new Chart(ctxGas, {
+        type: 'line',
+        data: {
+            labels: historicoLabels,
+            datasets: [{
+                label: 'Biogás (m³)',
+                data: historicoGas,
+                borderColor: '#52B788',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
 
     const ctxTemp = document.getElementById('tempChart').getContext('2d');
     tempChartInst = new Chart(ctxTemp, {
