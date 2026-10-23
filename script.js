@@ -160,4 +160,17 @@ function atualizarGraficosDinamicos(data) {
             datasets: [{
                 label: 'Biogás (m³)',
                 data: historicoGas,
-                borderColor
+                borderColor: '#52B788',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+window.realizarLogin = realizarLogin;
+window.realizarLogout = realizarLogout;
+window.navigate = navigate;
+window.toggleMenu = toggleMenu;
