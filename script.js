@@ -18,9 +18,6 @@ const db = getDatabase(app);
 
 function realizarLogin(event) {
     event.preventDefault();
-    
-    alert("O botão foi clicado com sucesso!");
-
     const email = document.getElementById('usuario').value.trim();
     const senha = document.getElementById('senha').value.trim();
     const erroMsg = document.getElementById('login-erro');
@@ -31,10 +28,9 @@ function realizarLogin(event) {
         })
         .catch((error) => {
             erroMsg.style.display = 'block';
-            alert("Erro do Firebase: " + error.code);
+            console.error("Erro no login:", error.code);
         });
 }
-
 function realizarLogout() {
     signOut(auth).then(() => {
         location.reload();
