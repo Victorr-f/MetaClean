@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-const firebaseConfig = {
+const configuracaoFirebase = {
     apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
     authDomain: "metaclean-site.firebaseapp.com",
     databaseURL: "https://metaclean-site-default-rtdb.firebaseio.com",
@@ -12,45 +12,45 @@ const firebaseConfig = {
     appId: "1:363120526555:web:08cc0f27f3aca6d99938fe"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+const app = initializeApp(configuracaoFirebase);
+const autenticacao = getAuth(app);
+const baseDados = getDatabase(app);
 
 let modoCadastro = false;
 
-function alternarModoLogin(event) {
-    event.preventDefault();
+function alternarModoLogin(evento) {
+    evento.preventDefault();
     modoCadastro = !modoCadastro;
-    const titulo = document.getElementById('login-titulo');
-    const btn = document.getElementById('btn-submit-login');
-    const toggleText = document.getElementById('toggle-text');
-    const toggleLink = document.getElementById('toggle-link');
-    const erroMsg = document.getElementById('login-erro');
-    erroMsg.style.display = 'none';
+    const titulo = document.getElementById('titulo-login');
+    const botao = document.getElementById('botao-enviar-login');
+    const textoAlternancia = document.getElementById('texto-alternancia');
+    const linkAlternancia = document.getElementById('link-alternancia');
+    const mensagemErro = document.getElementById('erro-login');
+    mensagemErro.style.display = 'none';
 
     if (modoCadastro) {
         titulo.innerText = "MetaClean - Cadastro";
-        btn.innerText = "Criar Conta";
-        toggleText.innerText = "Já tem uma conta?";
-        toggleLink.innerText = "Faça login";
+        botao.innerText = "Criar Conta";
+        textoAlternancia.innerText = "Já tem uma conta?";
+        linkAlternancia.innerText = "Faça login";
     } else {
         titulo.innerText = "MetaClean - Entrar";
-        btn.innerText = "Acessar Painel";
-        toggleText.innerText = "Não tem uma conta?";
-        toggleLink.innerText = "Cadastre-se";
+        botao.innerText = "Acessar Painel";
+        textoAlternancia.innerText = "Não tem uma conta?";
+        linkAlternancia.innerText = "Cadastre-se";
     }
 }
 
-function realizarLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById('usuario').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-    const erroMsg = document.getElementById('login-erro');
+function realizarLogin(evento) {
+    evento.preventDefault();
+    const email = document.getElementById('campo-usuario').value.trim();
+    const senha = document.getElementById('campo-senha').value.trim();
+    const mensagemErro = document.getElementById('erro-login');
 
     if (modoCadastro) {
-        createUserWithEmailAndPassword(auth, email, senha)
-            .then((userCredential) => {
-                const user = userCredential.user;
+        createUserWithEmailAndPassword(autenticacao, email, senha)
+            .then((credencialUtilizador) => {
+                const utilizador = credencialUtilizador.user;
                 const dadosIniciais = {
                     nomeDispositivo: "BIODIGESTOR #001",
                     temperatura: 0,
@@ -58,145 +58,145 @@ function realizarLogin(event) {
                     nivel: 0,
                     gas: 0
                 };
-                set(ref(db, 'dispositivos/' + user.uid), dadosIniciais);
-                erroMsg.style.display = 'none';
+                set(ref(baseDados, 'dispositivos/' + utilizador.uid), dadosIniciais);
+                mensagemErro.style.display = 'none';
             })
-            .catch((error) => {
-                erroMsg.style.display = 'block';
-                erroMsg.innerText = "Erro ao cadastrar: " + error.message;
+            .catch((erro) => {
+                mensagemErro.style.display = 'block';
+                mensagemErro.innerText = "Erro ao cadastrar: " + erro.message;
             });
     } else {
-        signInWithEmailAndPassword(auth, email, senha)
+        signInWithEmailAndPassword(autenticacao, email, senha)
             .then(() => {
-                erroMsg.style.display = 'none';
+                mensagemErro.style.display = 'none';
             })
-            .catch((error) => {
-                erroMsg.style.display = 'block';
-                erroMsg.innerText = "Usuário ou senha inválidos.";
+            .catch(() => {
+                mensagemErro.style.display = 'block';
+                mensagemErro.innerText = "Usuário ou senha inválidos.";
             });
     }
 }
 
 function realizarLogout() {
-    signOut(auth).then(() => {
+    signOut(autenticacao).then(() => {
         location.reload();
     });
 }
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('user-display-name').innerText = user.email;
-        escutarDadosDoBanco(user.uid);
+onAuthStateChanged(autenticacao, (utilizador) => {
+    if (utilizador) {
+        document.getElementById('sobreposicao-login').classList.add('hidden');
+        document.getElementById('nome-exibicao-usuario').innerText = utilizador.email;
+        escutarDadosDoBanco(utilizador.uid);
     } else {
-        document.getElementById('login-overlay').classList.remove('hidden');
+        document.getElementById('sobreposicao-login').classList.remove('hidden');
     }
 });
 
-let unsubscribeDB = null;
+let cancelarEscutaBanco = null;
 let ultimaLeituraTimestamp = Date.now();
 
-function escutarDadosDoBanco(userId) {
-    if (unsubscribeDB) {
-        unsubscribeDB();
+function escutarDadosDoBanco(idUtilizador) {
+    if (cancelarEscutaBanco) {
+        cancelarEscutaBanco();
     }
-    const sensorRef = ref(db, 'dispositivos/' + userId);
+    const referenciaSensor = ref(baseDados, 'dispositivos/' + idUtilizador);
     
-    unsubscribeDB = onValue(sensorRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
+    cancelarEscutaBanco = onValue(referenciaSensor, (snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
             ultimaLeituraTimestamp = Date.now();
             
-            const statusEl = document.getElementById('status-conexao');
-            if (statusEl) {
-                statusEl.innerText = "ESP32 / Banco de Dados — Conectado";
-                statusEl.style.color = "#2D6A4F";
+            const elementoStatus = document.getElementById('status-conexao');
+            if (elementoStatus) {
+                elementoStatus.innerText = "ESP32 / Banco de Dados — Conectado";
+                elementoStatus.style.color = "#52b788";
             }
 
-            document.getElementById('biodigestor-id').innerText = data.nomeDispositivo || "BIODIGESTOR";
-            document.getElementById('val-temp').innerText = data.temperatura || "--";
-            document.getElementById('val-umid').innerText = data.umidade || "--";
-            document.getElementById('val-nivel').innerText = data.nivel || "--";
-            document.getElementById('val-gas').innerText = data.gas || "--";
+            document.getElementById('id-biodigestor').innerText = dados.nomeDispositivo || "BIODIGESTOR";
+            document.getElementById('val-temp').innerText = dados.temperatura || "--";
+            document.getElementById('val-umid').innerText = dados.umidade || "--";
+            document.getElementById('val-nivel').innerText = dados.nivel || "--";
+            document.getElementById('val-gas').innerText = dados.gas || "--";
 
-            document.getElementById('mon-temp').innerText = data.temperatura || "--";
-            document.getElementById('mon-gas').innerText = data.gas || "--";
-            document.getElementById('last-update').innerText = new Date().toLocaleTimeString();
+            document.getElementById('mon-temp').innerText = dados.temperatura || "--";
+            document.getElementById('mon-gas').innerText = dados.gas || "--";
+            document.getElementById('ultima-atualizacao').innerText = new Date().toLocaleTimeString();
 
-            atualizarGraficosDinamicos(data);
+            atualizarGraficosDinamicos(dados);
         }
     });
 }
 
 setInterval(() => {
     const agora = Date.now();
-    const statusEl = document.getElementById('status-conexao');
-    if (statusEl && auth.currentUser) {
+    const elementoStatus = document.getElementById('status-conexao');
+    if (elementoStatus && autenticacao.currentUser) {
         if (agora - ultimaLeituraTimestamp > 70000) {
-            statusEl.innerText = "ESP32 — Desconectado";
-            statusEl.style.color = "#e63946";
+            elementoStatus.innerText = "ESP32 — Desconectado";
+            elementoStatus.style.color = "#e63946";
         }
     }
 }, 5000);
 
-function navigate(sectionId, element) {
-    document.querySelectorAll('.page-section').forEach(section => {
-        section.classList.remove('active');
+function navegar(idSecao, elemento) {
+    document.querySelectorAll('.secao-pagina').forEach(secao => {
+        secao.classList.remove('active');
     });
-    document.getElementById(sectionId).classList.add('active');
+    document.getElementById(idSecao).classList.add('active');
 
-    if(element) {
+    if(elemento) {
         document.querySelectorAll('.menu a').forEach(link => link.classList.remove('active'));
-        element.classList.add('active');
+        elemento.classList.add('active');
     }
 
     if (window.innerWidth <= 900) {
-        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('barra-lateral').classList.remove('open');
     }
 }
 
-function toggleMenu() {
-    document.getElementById('sidebar').classList.toggle('open');
+function alternarMenu() {
+    document.getElementById('barra-lateral').classList.toggle('open');
 }
 
 const maxPontos = 15; 
-let historicoLabels = [];
+let historicoEtiquetas = [];
 let historicoTemp = [];
 let historicoGas = [];
 
-let realtimeChartInst = null;
-let tempChartInst = null;
-let gasChartInst = null;
+let instanciaGraficoTempoReal = null;
+let instanciaGraficoTemp = null;
+let instanciaGraficoGas = null;
 
-function atualizarGraficosDinamicos(data) {
+function atualizarGraficosDinamicos(dados) {
     const horaAtual = new Date().toLocaleTimeString();
-    const tempAtual = parseFloat(data.temperatura) || 0;
-    const gasAtual = parseFloat(data.gas) || 0;
+    const tempAtual = parseFloat(dados.temperatura) || 0;
+    const gasAtual = parseFloat(dados.gas) || 0;
 
-    historicoLabels.push(horaAtual);
+    historicoEtiquetas.push(horaAtual);
     historicoTemp.push(tempAtual);
     historicoGas.push(gasAtual);
 
-    if (historicoLabels.length > maxPontos) {
-        historicoLabels.shift();
+    if (historicoEtiquetas.length > maxPontos) {
+        historicoEtiquetas.shift();
         historicoTemp.shift();
         historicoGas.shift();
     }
 
-    if(realtimeChartInst) realtimeChartInst.destroy();
-    if(tempChartInst) tempChartInst.destroy();
-    if(gasChartInst) gasChartInst.destroy();
+    if(instanciaGraficoTempoReal) instanciaGraficoTempoReal.destroy();
+    if(instanciaGraficoTemp) instanciaGraficoTemp.destroy();
+    if(instanciaGraficoGas) instanciaGraficoGas.destroy();
 
-    const ctxRealtime = document.getElementById('realtimeChart').getContext('2d');
-    realtimeChartInst = new Chart(ctxRealtime, {
+    const contextoTempoReal = document.getElementById('grafico-tempo-real').getContext('2d');
+    instanciaGraficoTempoReal = new Chart(contextoTempoReal, {
         type: 'line',
         data: {
-            labels: historicoLabels,
+            labels: historicoEtiquetas,
             datasets: [{
                 label: 'Temperatura °C',
                 data: historicoTemp,
-                borderColor: '#2D6A4F',
-                backgroundColor: 'rgba(45, 106, 79, 0.1)',
+                borderColor: '#52b788',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4
@@ -206,23 +206,23 @@ function atualizarGraficosDinamicos(data) {
             responsive: true, 
             maintainAspectRatio: true,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
         }
     });
 
-    const ctxTemp = document.getElementById('tempChart').getContext('2d');
-    tempChartInst = new Chart(ctxTemp, {
+    const contextoTemp = document.getElementById('grafico-temp').getContext('2d');
+    instanciaGraficoTemp = new Chart(contextoTemp, {
         type: 'line',
         data: {
-            labels: historicoLabels,
+            labels: historicoEtiquetas,
             datasets: [{
                 label: 'Temperatura (°C)',
                 data: historicoTemp,
-                borderColor: '#1B4332',
-                backgroundColor: 'rgba(27, 67, 50, 0.1)',
+                borderColor: '#2a6f4e',
+                backgroundColor: 'rgba(42, 111, 78, 0.1)',
                 fill: true,
                 tension: 0.3
             }]
@@ -231,22 +231,22 @@ function atualizarGraficosDinamicos(data) {
             responsive: true, 
             maintainAspectRatio: true,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
         }
     });
 
-    const ctxGas = document.getElementById('gasChart').getContext('2d');
-    gasChartInst = new Chart(ctxGas, {
+    const contextoGas = document.getElementById('grafico-gas').getContext('2d');
+    instanciaGraficoGas = new Chart(contextoGas, {
         type: 'line',
         data: {
-            labels: historicoLabels,
+            labels: historicoEtiquetas,
             datasets: [{
                 label: 'Biogás (m³)',
                 data: historicoGas,
-                borderColor: '#52B788',
+                borderColor: '#52b788',
                 backgroundColor: 'rgba(82, 183, 136, 0.1)',
                 fill: true,
                 tension: 0.3
@@ -256,10 +256,10 @@ function atualizarGraficosDinamicos(data) {
             responsive: true, 
             maintainAspectRatio: true,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
         }
     });
 }
@@ -267,5 +267,5 @@ function atualizarGraficosDinamicos(data) {
 window.realizarLogin = realizarLogin;
 window.realizarLogout = realizarLogout;
 window.alternarModoLogin = alternarModoLogin;
-window.navigate = navigate;
-window.toggleMenu = toggleMenu;
+window.navegar = navegar;
+window.alternarMenu = alternarMenu;
