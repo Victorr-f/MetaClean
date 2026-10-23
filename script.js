@@ -3,13 +3,13 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY_DO_FIREBASE",
-    authDomain: "seu-projeto.firebaseapp.com",
-    databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
-    projectId: "seu-projeto",
-    storageBucket: "seu-projeto.appspot.com",
-    messagingSenderId: "seu-id",
-    appId: "seu-app-id"
+  apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
+  authDomain: "metaclean-site.firebaseapp.com",
+  databaseURL: "https://metaclean-site-default-rtdb.firebaseio.com",
+  projectId: "metaclean-site",
+  storageBucket: "metaclean-site.firebasestorage.app",
+  messagingSenderId: "363120526555",
+  appId: "1:363120526555:web:08cc0f27f3aca6d99938fe"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -23,10 +23,10 @@ function realizarLogin(event) {
     const erroMsg = document.getElementById('login-erro');
 
     signInWithEmailAndPassword(auth, email, senha)
-        .then((userCredential) => {
+        .then(() => {
             erroMsg.style.display = 'none';
         })
-        .catch((error) => {
+        .catch(() => {
             erroMsg.style.display = 'block';
         });
 }
@@ -46,10 +46,6 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('login-overlay').classList.remove('hidden');
     }
 });
-
-let realtimeChartInst = null;
-let tempChartInst = null;
-let gasChartInst = null;
 
 function escutarDadosDoBanco(userId) {
     const sensorRef = ref(db, 'dispositivos/' + userId);
@@ -91,6 +87,10 @@ function navigate(sectionId, element) {
 function toggleMenu() {
     document.getElementById('sidebar').classList.toggle('open');
 }
+
+let realtimeChartInst = null;
+let tempChartInst = null;
+let gasChartInst = null;
 
 function atualizarGraficosDinamicos(data) {
     if(realtimeChartInst) realtimeChartInst.destroy();
