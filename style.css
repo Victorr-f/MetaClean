@@ -6,14 +6,16 @@
 }
 
 :root {
-    --primary-color: #2D6A4F;
-    --primary-dark: #1B4332;
+    --primary-color: #40916C;
+    --primary-dark: #081C15;
     --secondary-color: #52B788;
     --light-green: #95D5B2;
-    --bg-color: #f4f6f8;
-    --white: #ffffff;
-    --text-color: #333333;
-    --danger-color: #e63946;
+    --bg-color: #0B2519;
+    --card-bg: #133325;
+    --text-color: #E2E8F0;
+    --text-muted: #94A3B8;
+    --white: #FFFFFF;
+    --danger-color: #E63946;
 }
 
 body {
@@ -30,7 +32,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    background: linear-gradient(135deg, var(--primary-dark), #0B2519);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,17 +47,18 @@ body {
 }
 
 .login-card {
-    background: var(--white);
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     width: 100%;
     max-width: 400px;
     text-align: center;
 }
 
 .login-card h2 {
-    color: var(--primary-dark);
+    color: var(--white);
     margin-bottom: 24px;
 }
 
@@ -63,7 +66,9 @@ body {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
     border-radius: 6px;
     font-size: 14px;
     outline: none;
@@ -71,7 +76,7 @@ body {
 }
 
 .login-card input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--secondary-color);
 }
 
 .login-card button {
@@ -88,7 +93,7 @@ body {
 }
 
 .login-card button:hover {
-    background-color: var(--primary-dark);
+    background-color: var(--secondary-color);
 }
 
 #login-erro {
@@ -108,6 +113,7 @@ body {
     justify-content: space-between;
     transition: transform 0.3s ease;
     z-index: 100;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-header {
@@ -116,6 +122,7 @@ body {
     font-weight: bold;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
+    color: var(--light-green);
 }
 
 .menu {
@@ -127,15 +134,15 @@ body {
 .menu li a {
     display: block;
     padding: 15px 25px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-muted);
     text-decoration: none;
     transition: all 0.2s;
 }
 
 .menu li a:hover, .menu li a.active {
-    background-color: var(--primary-color);
+    background-color: rgba(64, 145, 108, 0.2);
     color: var(--white);
-    border-left: 4px solid var(--light-green);
+    border-left: 4px solid var(--secondary-color);
 }
 
 .sidebar-footer {
@@ -170,12 +177,21 @@ body {
 }
 
 .topbar {
-    background-color: var(--white);
+    background-color: var(--card-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.topbar h1 {
+    color: var(--white);
+    font-size: 22px;
+}
+
+.topbar span {
+    color: var(--text-muted) !important;
 }
 
 .page-container {
@@ -199,23 +215,24 @@ body {
 }
 
 .card {
-    background: var(--white);
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    border-left: 5px solid var(--primary-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border-left: 5px solid var(--secondary-color);
 }
 
 .card h3 {
     font-size: 14px;
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 8px;
 }
 
 .card .value {
     font-size: 24px;
     font-weight: bold;
-    color: var(--primary-dark);
+    color: var(--white);
 }
 
 .chart-container {
@@ -223,10 +240,11 @@ body {
     height: 280px !important;
     width: 100%;
     max-height: 280px;
-    background: var(--white);
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     margin-bottom: 30px;
     overflow: hidden;
 }
