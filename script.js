@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const configuracaoFirebase = {
     apiKey: "AIzaSyBad2CfhwiNf7DFXw_XGdBecnw0R0PcSew",
@@ -17,7 +17,6 @@ const autenticacao = getAuth(app);
 const baseDados = getDatabase(app);
 
 let modoCadastro = false;
-let intervaloSimulacao = null;
 
 function alternarModoLogin(evento) {
     evento.preventDefault();
@@ -53,7 +52,7 @@ function realizarLogin(evento) {
             .then((credencialUtilizador) => {
                 const utilizador = credencialUtilizador.user;
                 const dadosIniciais = {
-                    nomeDispositivo: "BIODIGESTOR #002",
+                    nomeDispositivo: "BIODIGESTOR #001",
                     temperatura: 0,
                     umidade: 0,
                     nivel: 0,
@@ -79,7 +78,6 @@ function realizarLogin(evento) {
 }
 
 function realizarLogout() {
-    pararSimulacao();
     signOut(autenticacao).then(() => {
         location.reload();
     });
@@ -89,64 +87,57 @@ onAuthStateChanged(autenticacao, (utilizador) => {
     if (utilizador) {
         document.getElementById('sobreposicao-login').classList.add('hidden');
         document.getElementById('nome-exibicao-usuario').innerText = utilizador.email;
-        inicializarGraficos();
-        iniciarSimulacao();
+        escutarDadosDoBanco(utilizador.uid);
     } else {
-        pararSimulacao();
         document.getElementById('sobreposicao-login').classList.remove('hidden');
     }
 });
 
-function gerarLeituraSimulada() {
-    const tempBase = 32.4 + (Math.random() * 2.8 - 1.4);
-    const umidBase = 71.0 + (Math.random() * 6.0 - 3.0);
-    const nivelBase = 58 + Math.floor(Math.random() * 9 - 4);
-    const gasBase = 12.6 + (Math.random() * 2.4 - 1.2);
+let cancelarEscutaBanco = null;
+let ultimaLeituraTimestamp = Date.now();
 
-    return {
-        nomeDispositivo: "BIODIGESTOR #002",
-        temperatura: tempBase.toFixed(1),
-        umidade: umidBase.toFixed(1),
-        nivel: Math.max(0, Math.min(100, nivelBase)),
-        gas: Math.max(0, gasBase).toFixed(2)
-    };
+function escutarDadosDoBanco(idUtilizador) {
+    if (cancelarEscutaBanco) {
+        cancelarEscutaBanco();
+    }
+    const referenciaSensor = ref(baseDados, 'dispositivos/' + idUtilizador);
+    
+    cancelarEscutaBanco = onValue(referenciaSensor, (snapshot) => {
+        const dados = snapshot.val();
+        if (dados) {
+            ultimaLeituraTimestamp = Date.now();
+            
+            const elementoStatus = document.getElementById('status-conexao');
+            if (elementoStatus) {
+                elementoStatus.innerText = "ESP32 / Banco de Dados — Conectado";
+                elementoStatus.style.color = "#52b788";
+            }
+
+            document.getElementById('id-biodigestor').innerText = dados.nomeDispositivo || "BIODIGESTOR";
+            document.getElementById('val-temp').innerText = dados.temperatura || "--";
+            document.getElementById('val-umid').innerText = dados.umidade || "--";
+            document.getElementById('val-nivel').innerText = dados.nivel || "--";
+            document.getElementById('val-gas').innerText = dados.gas || "--";
+
+            document.getElementById('mon-temp').innerText = dados.temperatura || "--";
+            document.getElementById('mon-gas').innerText = dados.gas || "--";
+            document.getElementById('ultima-atualizacao').innerText = new Date().toLocaleTimeString();
+
+            atualizarGraficosDinamicos(dados);
+        }
+    });
 }
 
-function aplicarDadosNaInterface(dados) {
+setInterval(() => {
+    const agora = Date.now();
     const elementoStatus = document.getElementById('status-conexao');
-    if (elementoStatus) {
-        elementoStatus.innerText = "ESP32 / Banco de Dados — Conectado";
-        elementoStatus.style.color = "#52b788";
+    if (elementoStatus && autenticacao.currentUser) {
+        if (agora - ultimaLeituraTimestamp > 70000) {
+            elementoStatus.innerText = "ESP32 — Desconectado";
+            elementoStatus.style.color = "#e63946";
+        }
     }
-
-    document.getElementById('id-biodigestor').innerText = dados.nomeDispositivo || "BIODIGESTOR #002";
-    document.getElementById('val-temp').innerText = dados.temperatura;
-    document.getElementById('val-umid').innerText = dados.umidade;
-    document.getElementById('val-nivel').innerText = dados.nivel;
-    document.getElementById('val-gas').innerText = dados.gas;
-
-    document.getElementById('mon-temp').innerText = dados.temperatura;
-    document.getElementById('mon-gas').innerText = dados.gas;
-    document.getElementById('ultima-atualizacao').innerText = new Date().toLocaleTimeString();
-
-    atualizarGraficosDinamicos(dados);
-}
-
-function iniciarSimulacao() {
-    pararSimulacao();
-    const atualizar = () => {
-        aplicarDadosNaInterface(gerarLeituraSimulada());
-    };
-    atualizar();
-    intervaloSimulacao = setInterval(atualizar, 3000);
-}
-
-function pararSimulacao() {
-    if (intervaloSimulacao) {
-        clearInterval(intervaloSimulacao);
-        intervaloSimulacao = null;
-    }
-}
+}, 5000);
 
 function navegar(idSecao, elemento) {
     document.querySelectorAll('.secao-pagina').forEach(secao => {
@@ -154,7 +145,7 @@ function navegar(idSecao, elemento) {
     });
     document.getElementById(idSecao).classList.add('active');
 
-    if (elemento) {
+    if(elemento) {
         document.querySelectorAll('.menu a').forEach(link => link.classList.remove('active'));
         elemento.classList.add('active');
     }
@@ -168,7 +159,7 @@ function alternarMenu() {
     document.getElementById('barra-lateral').classList.toggle('open');
 }
 
-const maxPontos = 15;
+const maxPontos = 15; 
 let historicoEtiquetas = [];
 let historicoTemp = [];
 let historicoGas = [];
@@ -177,79 +168,7 @@ let instanciaGraficoTempoReal = null;
 let instanciaGraficoTemp = null;
 let instanciaGraficoGas = null;
 
-function criarConfiguracaoGrafico(rotulo, dadosIniciais, corLinha, corFundo) {
-    return {
-        type: 'line',
-        data: {
-            labels: historicoEtiquetas,
-            datasets: [{
-                label: rotulo,
-                data: dadosIniciais,
-                borderColor: corLinha,
-                backgroundColor: corFundo,
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            scales: {
-                x: {
-                    ticks: { color: '#a0b0a8' },
-                    grid: { color: '#183b2c' }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: { color: '#a0b0a8' },
-                    grid: { color: '#183b2c' }
-                }
-            },
-            plugins: {
-                legend: {
-                    labels: { color: '#ffffff' }
-                }
-            }
-        }
-    };
-}
-
-function inicializarGraficos() {
-    if (instanciaGraficoTempoReal) instanciaGraficoTempoReal.destroy();
-    if (instanciaGraficoTemp) instanciaGraficoTemp.destroy();
-    if (instanciaGraficoGas) instanciaGraficoGas.destroy();
-
-    const canvasTempoReal = document.getElementById('grafico-tempo-real');
-    const canvasTemp = document.getElementById('grafico-temp');
-    const canvasGas = document.getElementById('grafico-gas');
-
-    if (canvasTempoReal) {
-        instanciaGraficoTempoReal = new Chart(
-            canvasTempoReal.getContext('2d'),
-            criarConfiguracaoGrafico('Temperatura °C', historicoTemp, '#52b788', 'rgba(82, 183, 136, 0.12)')
-        );
-    }
-    if (canvasTemp) {
-        instanciaGraficoTemp = new Chart(
-            canvasTemp.getContext('2d'),
-            criarConfiguracaoGrafico('Temperatura (°C)', historicoTemp, '#2a6f4e', 'rgba(42, 111, 78, 0.15)')
-        );
-    }
-    if (canvasGas) {
-        instanciaGraficoGas = new Chart(
-            canvasGas.getContext('2d'),
-            criarConfiguracaoGrafico('Biogás (m³)', historicoGas, '#52b788', 'rgba(82, 183, 136, 0.12)')
-        );
-    }
-}
-
 function atualizarGraficosDinamicos(dados) {
-    if (!instanciaGraficoTempoReal || !instanciaGraficoTemp || !instanciaGraficoGas) {
-        inicializarGraficos();
-    }
-
     const horaAtual = new Date().toLocaleTimeString();
     const tempAtual = parseFloat(dados.temperatura) || 0;
     const gasAtual = parseFloat(dados.gas) || 0;
@@ -264,17 +183,85 @@ function atualizarGraficosDinamicos(dados) {
         historicoGas.shift();
     }
 
-    instanciaGraficoTempoReal.data.labels = historicoEtiquetas;
-    instanciaGraficoTempoReal.data.datasets[0].data = historicoTemp;
-    instanciaGraficoTempoReal.update();
+    if(instanciaGraficoTempoReal) instanciaGraficoTempoReal.destroy();
+    if(instanciaGraficoTemp) instanciaGraficoTemp.destroy();
+    if(instanciaGraficoGas) instanciaGraficoGas.destroy();
 
-    instanciaGraficoTemp.data.labels = historicoEtiquetas;
-    instanciaGraficoTemp.data.datasets[0].data = historicoTemp;
-    instanciaGraficoTemp.update();
+    const contextoTempoReal = document.getElementById('grafico-tempo-real').getContext('2d');
+    instanciaGraficoTempoReal = new Chart(contextoTempoReal, {
+        type: 'line',
+        data: {
+            labels: historicoEtiquetas,
+            datasets: [{
+                label: 'Temperatura °C',
+                data: historicoTemp,
+                borderColor: '#52b788',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            scales: {
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
+        }
+    });
 
-    instanciaGraficoGas.data.labels = historicoEtiquetas;
-    instanciaGraficoGas.data.datasets[0].data = historicoGas;
-    instanciaGraficoGas.update();
+    const contextoTemp = document.getElementById('grafico-temp').getContext('2d');
+    instanciaGraficoTemp = new Chart(contextoTemp, {
+        type: 'line',
+        data: {
+            labels: historicoEtiquetas,
+            datasets: [{
+                label: 'Temperatura (°C)',
+                data: historicoTemp,
+                borderColor: '#2a6f4e',
+                backgroundColor: 'rgba(42, 111, 78, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            scales: {
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
+        }
+    });
+
+    const contextoGas = document.getElementById('grafico-gas').getContext('2d');
+    instanciaGraficoGas = new Chart(contextoGas, {
+        type: 'line',
+        data: {
+            labels: historicoEtiquetas,
+            datasets: [{
+                label: 'Biogás (m³)',
+                data: historicoGas,
+                borderColor: '#52b788',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            scales: {
+                x: { ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } },
+                y: { beginAtZero: true, ticks: { color: '#a0b0a8' }, grid: { color: '#183b2c' } }
+            },
+            plugins: { legend: { labels: { color: '#ffffff' } } }
+        }
+    });
 }
 
 window.realizarLogin = realizarLogin;
