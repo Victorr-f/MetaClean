@@ -73,20 +73,23 @@ Um sistema web moderno com autenticação segura de usuários e um painel em tem
 
 | Etapa | Descrição | Responsável | Data |
 | --- | --- | --- | --- |
-| 1 | Levantamento de requisitos e definição do escopo | Equipe | [Mês/Ano] |
-| 2 | adwd | Equipe | [Mês/Ano] |
-| 3 | adwd | Equipe | [Mês/Ano] |
-| 4 | adwd | Equipe | [Mês/Ano] |
-| 5 | adwd | Equipe | [Mês/Ano] |
-| 6 | Apresentação e entrega do projeto | Equipe | [Mês/Ano] |
+| 1 | Levantamento de requisitos e definição do escopo | Líder / Luís | [04/2026] |
+| 2 | Aquisição dos materiais para a construção do arduino e biodigestor | Matheus | [06/2026] |
+| 3 | Inicio da construção do biodigestor | Matheus | [08/2026] |
+| 4 | Desenvolvimento do site | Victor | [08/2026] |
+| 5 | Desenvolvimento do arduino | Lucas Custódio | [08/2026] |
+| 6 | Apresentação e entrega do projeto | Equipe | [11/2026] |
 
 🧑‍💻 **Integrantes da Equipe**
 
 | Nome | Função | Responsabilidade |
 | --- | --- | --- |
-| [Nome] | Desenvolvedor | Estrutura web, lógica JS e integração com Firebase |
-| [Nome] | Desenvolvedor  / Hardware | Programação do ESP32 e configuração dos sensores |
-| [Nome] | Designer / Testador | Estilização CSS, paleta de cores e validação de requisitos |
+| [Victor Rogério Fideles Hordones Olimpio 2B] | Desenvolvedor | Estrutura web, lógica JS, integração com Firebase, estilização CSS, paleta de cores e validação de requisitos |
+| [Lucas Custódio Rodrigues 1B] | Desenvolvedor  / Hardware | Programação do ESP32 e configuração dos sensores |
+| [Matheus Henrique Santos Dutra 3B] | Montagem / Apresentação | Construção do Biodigestor, Apresentação para banca avaliadora |
+| [Luís Miguel Mendes Costa 3A] | Desenvolvedor  / Pesquisador | Desenvolvimento e pesquisa do protótipo físico e digital |
+| [Lucas Mateus Soares de Cristo Paiva 1A] | Documentação | Desenvolvimento da documentação do projeto |
+| [Isabelle Oliveira Ramos 1A] | Documentação | Desenvolvimento da documentação do projeto |
 
 🔐 **Controle de Acesso**
 
