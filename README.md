@@ -97,8 +97,8 @@ Um sistema web moderno com autenticação segura de usuários e um painel em tem
  
 📷 **Protótipos / Telas**
 
-* <img width="1919" height="942" alt="Captura de tela 2026-11-14 181734" src="https://github.com/user-attachments/assets/ea674d5e-f4ab-432a-a657-b8413bac1639" />
- *
+ <img width="1919" height="942" alt="Captura de tela 2026-11-14 181734" src="https://github.com/user-attachments/assets/ea674d5e-f4ab-432a-a657-b8413bac1639" />
+ 
 
 📦 **Como Executar o Projeto**
 
